@@ -1,11 +1,13 @@
 package com.hfad.musicwizard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
@@ -14,12 +16,12 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 
+
 public class MainActivity extends AppCompatActivity implements Search.View {
 
     private SearchView searchView;
     private BottomNavigationView bottomNavigationView;
     private RecyclerView resultListRecyclerView;
-    private Song song;
 
 
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -30,29 +32,6 @@ public class MainActivity extends AppCompatActivity implements Search.View {
     public static final String EXTRA_TOKEN = "EXTRA_TOKEN";
     private static final String KEY_CURRENT_QUERY = "EXTRA_QUERY";
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-
-                    return true;
-                case R.id.navigation_library:
-                    Intent a = new Intent(MainActivity.this, MusicLibraryActivity.class);
-                    startActivity(a);
-
-                    return true;
-                case R.id.navigation_concerts:
-                    Intent b = new Intent(MainActivity.this, ConcertActivity.class);
-                    startActivity(b);
-
-                    return true;
-            }
-            return false;
-        }
-    };
 
     private class ScrollListener extends ResultListScrollListener {
 
@@ -81,8 +60,28 @@ public class MainActivity extends AppCompatActivity implements Search.View {
     }
 
     private void wireWidgets() {
-        bottomNavigationView = findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        Menu menu = bottomNavigationView.getMenu();
+        MenuItem menuItem = menu.getItem(0);
+        menuItem.setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.navigation_home:
+                        break;
+
+                    case R.id.navigation_musicLibrary:
+                        Intent intent2 = new Intent(MainActivity.this, LyricActivity.class);
+                        startActivity(intent2);
+                        break;
+
+                    case R.id.navigation_concerts:
+                        break;
+                }
+                return false;
+            }
+        });
 
         // setup search field
         searchView = findViewById(R.id.searchview_mainactivity_search);
@@ -115,30 +114,6 @@ public class MainActivity extends AppCompatActivity implements Search.View {
         resultListRecyclerView.setAdapter(adapter);
 
     }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        menu.add(Menu.NONE, MENU_SAVE, Menu.NONE, "SAVE");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int index = info.position;
-        switch (item.getItemId()) {
-            case MENU_SAVE:
-                //delete_item(info.id);
-                song = (Song) MainActivity.getItemAtPosition(index);
-                saveSong();
-
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-
 
     @Override
     public void reset() {
@@ -176,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements Search.View {
         super.onDestroy();
     }
 
+
 /*
     Connector.ConnectionListener mConnectionListener = new Connector.ConnectionListener() {
         @Override
@@ -183,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements Search.View {
             mSpotifyAppRemote = spotifyAppRemote;
             // setup all the things
         }
-
         @Override
         public void onFailure(Throwable error) {
             if (error instanceof NotLoggedInException || error instanceof UserNotAuthorizedException) {
@@ -193,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements Search.View {
             }
         }
     };
-
     private void connect() {
         ConnectionParams connectionParams = new ConnectionParams.Builder(CLIENT_ID).setRedirectUri(REDIRECT_URI).showAuthView(true).build();
         SpotifyAppRemote.connect(getApplication(), connectionParams, new Connector.ConnectionListener() {
@@ -201,22 +175,18 @@ public class MainActivity extends AppCompatActivity implements Search.View {
             public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                 mSpotifyAppRemote = spotifyAppRemote;
                 Log.d("MainActivity", "Connected! Yay!");
-
                 //now you can start interacting with App Remote
                 connected();
             }
-
             @Override
             public void onFailure(Throwable throwable) {
                 Log.e("MainActivity", throwable.getMessage(), throwable);
             }
         });
     }
-
     private void connected() {
         // Play a playlist
         mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
-
         // Subscribe to PlayerState
         mSpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(playerState -> {
             final Track track = playerState.track;
@@ -225,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements Search.View {
             }
         });
     }
-
     @Override
     protected void onStop() {
         super.onStop();

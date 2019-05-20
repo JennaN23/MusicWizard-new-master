@@ -9,7 +9,7 @@ import retrofit.android.MainThreadExecutor;
 
 public class MusixMatchAPI {
 
-    public static final String BASE_URL = "https://api.musixmatch.com/ws/1.1/";
+    /*public static final String BASE_URL = "https://api.musixmatch.com/ws/1.1/";
     private MusixMatchService musixMatchService;
     private String token;
 
@@ -45,6 +45,6 @@ public class MusixMatchAPI {
 
     public MusixMatchService getService() {
         return musixMatchService;
-    }
+    }**/
 
 }
